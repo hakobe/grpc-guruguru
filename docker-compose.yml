@@ -1,0 +1,25 @@
+version: '3.5'
+services:
+  boss:
+    build: ./boss
+    ports:
+     - "5000:5000"
+    volumes:
+      - "./boss:/go/src/github.com/hakobe/grpc-guruguru/boss"
+    environment:
+      HOST_PORT: 0.0.0.0:5000
+    command: go run boss.go
+  go_worker:
+    build: ./go_worker
+    ports:
+     - "5010:5000"
+    volumes:
+      - "./go_worker:/go/src/github.com/hakobe/grpc-guruguru/go_worker"
+    depends_on:
+      - boss
+    environment:
+      WORKER_NAME: go_worker
+      HOST_PORT: 0.0.0.0:5000
+      PUBLIC_HOST_PORT: go_worker:5010
+      BOSS_HOST_PORT: boss:5000
+    command: go run go_worker.go
