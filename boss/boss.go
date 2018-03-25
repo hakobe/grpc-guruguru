@@ -15,51 +15,56 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-type Worker struct {
+type Member struct {
 	Name     string
 	HostPort string
 }
 
 type Server struct {
-	Workers map[string]*Worker
+	Members map[string]*Member
 	lock    sync.RWMutex
 }
 
 func newServer() *Server {
 	return &Server{
-		Workers: make(map[string]*Worker),
+		Members: make(map[string]*Member),
 		lock:    sync.RWMutex{},
 	}
 }
 
 func (s *Server) Join(ctx context.Context, in *pb.JoinRequest) (*pb.Res, error) {
+	member := in.GetMember()
+	if member == nil {
+		log.Fatalf("could not get joining member")
+	}
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	s.Workers[in.GetName()] = &Worker{
-		Name:     in.GetName(),
-		HostPort: in.GetHostPort(),
+	s.Members[member.GetName()] = &Member{
+		Name:     member.GetName(),
+		HostPort: member.GetHostPort(),
 	}
 
-	fmt.Printf("%s is joined.\n", in.GetName())
+	fmt.Printf("%s is joined.\n", member.GetName())
 
 	return &pb.Res{Ok: true}, nil
 }
 
-func (s *Server) GetWorkers() []*Worker {
+func (s *Server) GetMembers() []*Member {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	workers := []*Worker{}
-	for _, worker := range s.Workers {
-		workers = append(workers, worker)
+	members := []*Member{}
+	for _, member := range s.Members {
+		members = append(members, member)
 	}
-	shuffle(workers)
+	shuffle(members)
 
-	return workers
+	return members
 }
 
-func shuffle(data []*Worker) {
+func shuffle(data []*Member) {
 	n := len(data)
 	for i := n - 1; i >= 0; i-- {
 		j := rand.Intn(i + 1)
@@ -88,7 +93,7 @@ func serve(server *Server, hostPort string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	pb.RegisterBossServer(grpcServer, server)
+	pb.RegisterBossServiceServer(grpcServer, server)
 	reflection.Register(grpcServer)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -103,33 +108,38 @@ func getConn(hostPort string) *grpc.ClientConn {
 	return conn
 }
 
-func sendTask(worker *Worker, fromName string) {
-	conn := getConn(worker.HostPort)
+func sendPoke(from *Member, to *Member) {
+	conn := getConn(to.HostPort)
 	defer conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	client := pb.NewWorkerClient(conn)
-	res, err := client.AcceptTask(ctx, &pb.Task{
-		FromName: fromName,
+	client := pb.NewMemberServiceClient(conn)
+	res, err := client.Poke(ctx, &pb.PokeRequest{
+		From: &pb.Member{
+			Name:     from.Name,
+			HostPort: from.HostPort,
+		},
 	})
 	if err != nil || !res.GetOk() {
-		log.Fatalf("could not send task: %v", err)
+		log.Fatalf("could not send poke: %v", err)
 	}
 }
 
-func setNext(worker *Worker, nextWorker *Worker) {
-	conn := getConn(worker.HostPort)
+func setNext(to *Member, next *Member) {
+	conn := getConn(to.HostPort)
 	defer conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	client := pb.NewWorkerClient(conn)
-	res, err := client.SetNext(ctx, &pb.Next{
-		NextName:     nextWorker.Name,
-		NextHostPort: nextWorker.HostPort,
+	client := pb.NewMemberServiceClient(conn)
+	res, err := client.SetNext(ctx, &pb.SetNextRequest{
+		Member: &pb.Member{
+			Name:     next.Name,
+			HostPort: next.HostPort,
+		},
 	})
 	if err != nil || !res.GetOk() {
 		log.Fatalf("could not set next: %v", err)
@@ -140,18 +150,18 @@ func startTask(server *Server) {
 	time.Sleep(5 * time.Second)
 	fmt.Println("Workers are gathered.")
 
-	workers := server.GetWorkers()
-	n := len(workers)
+	members := server.GetMembers()
+	n := len(members)
 	for i := 0; i < n; i++ {
-		worker := workers[i]
-		nextWorker := workers[(i+1)%n]
+		member := members[i]
+		nextMember := members[(i+1)%n]
 
-		fmt.Printf("Setting worker %s(%s) -> %s(%s)\n", worker.Name, worker.HostPort, nextWorker.Name, nextWorker.HostPort)
-		setNext(worker, nextWorker)
+		fmt.Printf("Setting worker %s(%s) -> %s(%s)\n", member.Name, member.HostPort, nextMember.Name, nextMember.HostPort)
+		setNext(member, nextMember)
 	}
 
-	if len(workers) > 0 {
-		sendTask(workers[0], "boss")
+	if len(members) > 0 {
+		sendPoke(&Member{Name: "boss", HostPort: ""}, members[0])
 	}
 }
 

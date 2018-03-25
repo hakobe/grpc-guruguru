@@ -8,10 +8,11 @@ It is generated from these files:
 	guruguru.proto
 
 It has these top-level messages:
-	JoinRequest
+	Member
 	Res
-	Next
-	Task
+	JoinRequest
+	PokeRequest
+	SetNextRequest
 */
 package guruguru
 
@@ -35,24 +36,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type JoinRequest struct {
+type Member struct {
 	Name     string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	HostPort string `protobuf:"bytes,2,opt,name=host_port,json=hostPort" json:"host_port,omitempty"`
 }
 
-func (m *JoinRequest) Reset()                    { *m = JoinRequest{} }
-func (m *JoinRequest) String() string            { return proto.CompactTextString(m) }
-func (*JoinRequest) ProtoMessage()               {}
-func (*JoinRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *Member) Reset()                    { *m = Member{} }
+func (m *Member) String() string            { return proto.CompactTextString(m) }
+func (*Member) ProtoMessage()               {}
+func (*Member) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *JoinRequest) GetName() string {
+func (m *Member) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *JoinRequest) GetHostPort() string {
+func (m *Member) GetHostPort() string {
 	if m != nil {
 		return m.HostPort
 	}
@@ -75,51 +76,68 @@ func (m *Res) GetOk() bool {
 	return false
 }
 
-type Next struct {
-	NextName     string `protobuf:"bytes,1,opt,name=next_name,json=nextName" json:"next_name,omitempty"`
-	NextHostPort string `protobuf:"bytes,2,opt,name=next_host_port,json=nextHostPort" json:"next_host_port,omitempty"`
+type JoinRequest struct {
+	Member *Member `protobuf:"bytes,1,opt,name=member" json:"member,omitempty"`
 }
 
-func (m *Next) Reset()                    { *m = Next{} }
-func (m *Next) String() string            { return proto.CompactTextString(m) }
-func (*Next) ProtoMessage()               {}
-func (*Next) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *JoinRequest) Reset()                    { *m = JoinRequest{} }
+func (m *JoinRequest) String() string            { return proto.CompactTextString(m) }
+func (*JoinRequest) ProtoMessage()               {}
+func (*JoinRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *Next) GetNextName() string {
+func (m *JoinRequest) GetMember() *Member {
 	if m != nil {
-		return m.NextName
+		return m.Member
+	}
+	return nil
+}
+
+type PokeRequest struct {
+	From    *Member `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
+	Message string  `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
+}
+
+func (m *PokeRequest) Reset()                    { *m = PokeRequest{} }
+func (m *PokeRequest) String() string            { return proto.CompactTextString(m) }
+func (*PokeRequest) ProtoMessage()               {}
+func (*PokeRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *PokeRequest) GetFrom() *Member {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+func (m *PokeRequest) GetMessage() string {
+	if m != nil {
+		return m.Message
 	}
 	return ""
 }
 
-func (m *Next) GetNextHostPort() string {
-	if m != nil {
-		return m.NextHostPort
-	}
-	return ""
+type SetNextRequest struct {
+	Member *Member `protobuf:"bytes,1,opt,name=member" json:"member,omitempty"`
 }
 
-type Task struct {
-	FromName string `protobuf:"bytes,1,opt,name=from_name,json=fromName" json:"from_name,omitempty"`
-}
+func (m *SetNextRequest) Reset()                    { *m = SetNextRequest{} }
+func (m *SetNextRequest) String() string            { return proto.CompactTextString(m) }
+func (*SetNextRequest) ProtoMessage()               {}
+func (*SetNextRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
-func (m *Task) Reset()                    { *m = Task{} }
-func (m *Task) String() string            { return proto.CompactTextString(m) }
-func (*Task) ProtoMessage()               {}
-func (*Task) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
-
-func (m *Task) GetFromName() string {
+func (m *SetNextRequest) GetMember() *Member {
 	if m != nil {
-		return m.FromName
+		return m.Member
 	}
-	return ""
+	return nil
 }
 
 func init() {
-	proto.RegisterType((*JoinRequest)(nil), "JoinRequest")
+	proto.RegisterType((*Member)(nil), "Member")
 	proto.RegisterType((*Res)(nil), "Res")
-	proto.RegisterType((*Next)(nil), "Next")
-	proto.RegisterType((*Task)(nil), "Task")
+	proto.RegisterType((*JoinRequest)(nil), "JoinRequest")
+	proto.RegisterType((*PokeRequest)(nil), "PokeRequest")
+	proto.RegisterType((*SetNextRequest)(nil), "SetNextRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -130,161 +148,161 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Boss service
+// Client API for BossService service
 
-type BossClient interface {
+type BossServiceClient interface {
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Res, error)
 }
 
-type bossClient struct {
+type bossServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewBossClient(cc *grpc.ClientConn) BossClient {
-	return &bossClient{cc}
+func NewBossServiceClient(cc *grpc.ClientConn) BossServiceClient {
+	return &bossServiceClient{cc}
 }
 
-func (c *bossClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Res, error) {
+func (c *bossServiceClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Res, error) {
 	out := new(Res)
-	err := grpc.Invoke(ctx, "/Boss/Join", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/BossService/Join", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Boss service
+// Server API for BossService service
 
-type BossServer interface {
+type BossServiceServer interface {
 	Join(context.Context, *JoinRequest) (*Res, error)
 }
 
-func RegisterBossServer(s *grpc.Server, srv BossServer) {
-	s.RegisterService(&_Boss_serviceDesc, srv)
+func RegisterBossServiceServer(s *grpc.Server, srv BossServiceServer) {
+	s.RegisterService(&_BossService_serviceDesc, srv)
 }
 
-func _Boss_Join_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BossService_Join_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(JoinRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BossServer).Join(ctx, in)
+		return srv.(BossServiceServer).Join(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Boss/Join",
+		FullMethod: "/BossService/Join",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BossServer).Join(ctx, req.(*JoinRequest))
+		return srv.(BossServiceServer).Join(ctx, req.(*JoinRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Boss_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "Boss",
-	HandlerType: (*BossServer)(nil),
+var _BossService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "BossService",
+	HandlerType: (*BossServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Join",
-			Handler:    _Boss_Join_Handler,
+			Handler:    _BossService_Join_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "guruguru.proto",
 }
 
-// Client API for Worker service
+// Client API for MemberService service
 
-type WorkerClient interface {
-	SetNext(ctx context.Context, in *Next, opts ...grpc.CallOption) (*Res, error)
-	AcceptTask(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Res, error)
+type MemberServiceClient interface {
+	Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*Res, error)
+	SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*Res, error)
 }
 
-type workerClient struct {
+type memberServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewWorkerClient(cc *grpc.ClientConn) WorkerClient {
-	return &workerClient{cc}
+func NewMemberServiceClient(cc *grpc.ClientConn) MemberServiceClient {
+	return &memberServiceClient{cc}
 }
 
-func (c *workerClient) SetNext(ctx context.Context, in *Next, opts ...grpc.CallOption) (*Res, error) {
+func (c *memberServiceClient) Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*Res, error) {
 	out := new(Res)
-	err := grpc.Invoke(ctx, "/Worker/SetNext", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/MemberService/Poke", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *workerClient) AcceptTask(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Res, error) {
+func (c *memberServiceClient) SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*Res, error) {
 	out := new(Res)
-	err := grpc.Invoke(ctx, "/Worker/AcceptTask", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/MemberService/SetNext", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Worker service
+// Server API for MemberService service
 
-type WorkerServer interface {
-	SetNext(context.Context, *Next) (*Res, error)
-	AcceptTask(context.Context, *Task) (*Res, error)
+type MemberServiceServer interface {
+	Poke(context.Context, *PokeRequest) (*Res, error)
+	SetNext(context.Context, *SetNextRequest) (*Res, error)
 }
 
-func RegisterWorkerServer(s *grpc.Server, srv WorkerServer) {
-	s.RegisterService(&_Worker_serviceDesc, srv)
+func RegisterMemberServiceServer(s *grpc.Server, srv MemberServiceServer) {
+	s.RegisterService(&_MemberService_serviceDesc, srv)
 }
 
-func _Worker_SetNext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Next)
+func _MemberService_Poke_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PokeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WorkerServer).SetNext(ctx, in)
+		return srv.(MemberServiceServer).Poke(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Worker/SetNext",
+		FullMethod: "/MemberService/Poke",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkerServer).SetNext(ctx, req.(*Next))
+		return srv.(MemberServiceServer).Poke(ctx, req.(*PokeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Worker_AcceptTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Task)
+func _MemberService_SetNext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetNextRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WorkerServer).AcceptTask(ctx, in)
+		return srv.(MemberServiceServer).SetNext(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Worker/AcceptTask",
+		FullMethod: "/MemberService/SetNext",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkerServer).AcceptTask(ctx, req.(*Task))
+		return srv.(MemberServiceServer).SetNext(ctx, req.(*SetNextRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Worker_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "Worker",
-	HandlerType: (*WorkerServer)(nil),
+var _MemberService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "MemberService",
+	HandlerType: (*MemberServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SetNext",
-			Handler:    _Worker_SetNext_Handler,
+			MethodName: "Poke",
+			Handler:    _MemberService_Poke_Handler,
 		},
 		{
-			MethodName: "AcceptTask",
-			Handler:    _Worker_AcceptTask_Handler,
+			MethodName: "SetNext",
+			Handler:    _MemberService_SetNext_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -294,20 +312,21 @@ var _Worker_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("guruguru.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 237 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x90, 0x4f, 0x4b, 0x03, 0x31,
-	0x10, 0xc5, 0xe9, 0x9a, 0xd6, 0xed, 0x58, 0xf6, 0x30, 0xa0, 0xd4, 0x7a, 0x91, 0xe8, 0xc1, 0x53,
-	0x0e, 0xf5, 0x28, 0x08, 0x7a, 0x52, 0x0f, 0x45, 0xa2, 0xe0, 0xb1, 0xd4, 0x32, 0xfe, 0x21, 0x74,
-	0x67, 0x4d, 0x66, 0x61, 0x3f, 0xbe, 0x4c, 0x16, 0x61, 0xed, 0x21, 0x4c, 0x78, 0x2f, 0xf3, 0x9b,
-	0xbc, 0x81, 0xea, 0xb3, 0x8d, 0xad, 0x1e, 0xd7, 0x44, 0x16, 0xb6, 0xb7, 0x70, 0xf4, 0xc4, 0xdf,
-	0xb5, 0xa7, 0x9f, 0x96, 0x92, 0x20, 0x82, 0xa9, 0x37, 0x3b, 0x9a, 0x8f, 0xce, 0x47, 0x57, 0x53,
-	0x9f, 0xef, 0x78, 0x06, 0xd3, 0x2f, 0x4e, 0xb2, 0x6e, 0x38, 0xca, 0xbc, 0xc8, 0x46, 0xa9, 0xc2,
-	0x33, 0x47, 0xb1, 0xc7, 0x70, 0xe0, 0x29, 0x61, 0x05, 0x05, 0x87, 0xdc, 0x55, 0xfa, 0x82, 0x83,
-	0x7d, 0x04, 0xb3, 0xa2, 0x4e, 0xb4, 0xb7, 0xa6, 0x4e, 0xd6, 0x03, 0x68, 0xa9, 0xc2, 0x4a, 0xc1,
-	0x97, 0x50, 0x65, 0x73, 0x9f, 0x3e, 0x53, 0xf5, 0xe1, 0x6f, 0xc2, 0x05, 0x98, 0xd7, 0x4d, 0x0a,
-	0x8a, 0xfa, 0x88, 0xbc, 0xfb, 0x87, 0x52, 0x41, 0x51, 0x4b, 0x0b, 0xe6, 0x9e, 0x53, 0xc2, 0x05,
-	0x18, 0x8d, 0x83, 0x33, 0x37, 0x48, 0xb5, 0x30, 0xce, 0x53, 0x5a, 0xde, 0xc0, 0xe4, 0x8d, 0x63,
-	0xa0, 0x88, 0x27, 0x70, 0xf8, 0x42, 0x92, 0x3f, 0x38, 0x76, 0x5a, 0xfa, 0x17, 0x78, 0x0a, 0x70,
-	0xb7, 0xdd, 0x52, 0x23, 0x79, 0xe0, 0xd8, 0x69, 0xe9, 0xad, 0xf7, 0x49, 0x5e, 0xd7, 0xf5, 0x6f,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0xd2, 0xe4, 0x6b, 0x9a, 0x40, 0x01, 0x00, 0x00,
+	// 249 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0xc1, 0x4a, 0xc3, 0x40,
+	0x10, 0x86, 0x69, 0x0c, 0x49, 0x3b, 0xa9, 0x11, 0x06, 0x84, 0xd0, 0x1e, 0x2c, 0x7b, 0xd2, 0xcb,
+	0x82, 0xf1, 0xe4, 0x55, 0x3c, 0x09, 0x95, 0xb2, 0x7d, 0x00, 0x69, 0x65, 0xac, 0x25, 0x6c, 0xa7,
+	0xee, 0x6c, 0xc4, 0xc7, 0x97, 0xec, 0xa6, 0x10, 0x3d, 0xf5, 0xb0, 0xb0, 0xfb, 0xef, 0x37, 0xfc,
+	0x1f, 0x03, 0xe5, 0xae, 0x75, 0x6d, 0x77, 0xf4, 0xd1, 0xb1, 0x67, 0xf5, 0x08, 0xd9, 0x92, 0xec,
+	0x96, 0x1c, 0x22, 0xa4, 0x87, 0x8d, 0xa5, 0x6a, 0xb4, 0x18, 0xdd, 0x4e, 0x4c, 0xb8, 0xe3, 0x1c,
+	0x26, 0x9f, 0x2c, 0xfe, 0xed, 0xc8, 0xce, 0x57, 0x49, 0xf8, 0x18, 0x77, 0xc1, 0x8a, 0x9d, 0x57,
+	0xd7, 0x70, 0x61, 0x48, 0xb0, 0x84, 0x84, 0x9b, 0x30, 0x35, 0x36, 0x09, 0x37, 0x4a, 0x43, 0xf1,
+	0xc2, 0xfb, 0x83, 0xa1, 0xaf, 0x96, 0xc4, 0xe3, 0x0d, 0x64, 0x36, 0x14, 0x04, 0xa4, 0xa8, 0x73,
+	0x1d, 0xfb, 0x4c, 0x1f, 0xab, 0x67, 0x28, 0x56, 0xdc, 0xd0, 0x89, 0x9f, 0x43, 0xfa, 0xe1, 0xd8,
+	0xfe, 0xa7, 0x43, 0x88, 0x15, 0xe4, 0x96, 0x44, 0x36, 0x3b, 0xea, 0x6d, 0x4e, 0x4f, 0x75, 0x0f,
+	0xe5, 0x9a, 0xfc, 0x2b, 0xfd, 0xf8, 0x73, 0x8b, 0xeb, 0x3b, 0x28, 0x9e, 0x58, 0x64, 0x4d, 0xee,
+	0x7b, 0xff, 0x4e, 0x38, 0x83, 0xb4, 0xf3, 0xc6, 0xa9, 0x1e, 0xe8, 0xcf, 0x52, 0x6d, 0x48, 0xea,
+	0x25, 0x5c, 0xc6, 0xe1, 0x01, 0xdc, 0x49, 0xe3, 0x54, 0x0f, 0xdc, 0x23, 0x8c, 0x0b, 0xc8, 0x7b,
+	0x15, 0xbc, 0xd2, 0x7f, 0xa5, 0x22, 0xb1, 0xcd, 0xc2, 0xee, 0x1f, 0x7e, 0x03, 0x00, 0x00, 0xff,
+	0xff, 0x93, 0x26, 0x2a, 0x4e, 0x8d, 0x01, 0x00, 0x00,
 }

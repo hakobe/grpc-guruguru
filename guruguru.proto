@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-message JoinRequest {
+message Member {
     string name = 1;
     string host_port = 2;
 }
@@ -9,20 +9,24 @@ message Res {
     bool ok = 1;
 }
 
-service Boss {
+message JoinRequest {
+    Member member = 1;
+}
+
+service BossService {
     rpc Join (JoinRequest) returns (Res);
 }
 
-message Next {
-    string next_name = 1;
-    string next_host_port = 2;
+message PokeRequest {
+    Member from = 1;
+    string message = 2;
 }
 
-message Task {
-    string from_name = 1;
+message SetNextRequest {
+    Member member = 1;
 }
 
-service Worker {
-    rpc SetNext (Next) returns (Res);
-    rpc AcceptTask (Task) returns (Res);
+service MemberService {
+    rpc Poke(PokeRequest) returns (Res);
+    rpc SetNext (SetNextRequest) returns (Res);
 }

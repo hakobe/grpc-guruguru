@@ -14,46 +14,62 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+type Member struct {
+	Name     string
+	HostPort string
+}
+
 type Server struct {
-	Config       *Config
-	NextName     string
-	NextHostPort string
-	lock         sync.RWMutex
+	Config *Config
+	Next   *Member
+	lock   sync.RWMutex
 }
 
-func (s *Server) SetNext(ctx context.Context, in *pb.Next) (*pb.Res, error) {
-	fmt.Printf("Set next to %s(%s)\n", in.NextName, in.NextHostPort)
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	s.NextName = in.GetNextName()
-	s.NextHostPort = in.GetNextHostPort()
-
-	return &pb.Res{Ok: true}, nil
+func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.Res, error) {
+	if member := in.GetMember(); member != nil {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		s.Next = &Member{
+			Name:     member.Name,
+			HostPort: member.HostPort,
+		}
+		fmt.Printf("Set next to %s(%s)\n", s.Next.Name, s.Next.HostPort)
+		return &pb.Res{Ok: true}, nil
+	}
+	return &pb.Res{Ok: false}, nil
 }
 
-func (s *Server) acceptTask(ctx context.Context, in *pb.Task) {
-	fmt.Printf("from:%s -> me:%s -> next:%s\n", in.FromName, s.Config.WorkerName, s.NextName)
+func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
+	from := in.GetFrom()
+	if from == nil {
+		log.Fatalf("could not get from-member")
+	}
+
+	fmt.Printf("from:%s -> me:%s -> next:%s\n", from.GetName(), s.Config.WorkerName, s.Next.Name)
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	conn := getConn(s.NextHostPort)
+	conn := getConn(s.Next.HostPort)
 	defer conn.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	client := pb.NewWorkerClient(conn)
-	res, err := client.AcceptTask(ctx, &pb.Task{
-		FromName: s.Config.WorkerName,
+	client := pb.NewMemberServiceClient(conn)
+	res, err := client.Poke(ctx, &pb.PokeRequest{
+		From: &pb.Member{
+			Name:     s.Next.Name,
+			HostPort: s.Next.HostPort,
+		},
+		Message: "Gopher is the best programming language mascot!!",
 	})
 	if err != nil || !res.GetOk() {
 		log.Fatalf("could not send task: %v", err)
 	}
 }
 
-func (s *Server) AcceptTask(ctx context.Context, in *pb.Task) (*pb.Res, error) {
-	go s.acceptTask(ctx, in)
+func (s *Server) Poke(ctx context.Context, in *pb.PokeRequest) (*pb.Res, error) {
+	go s.poke(ctx, in)
 	return &pb.Res{Ok: true}, nil
 }
 
@@ -105,11 +121,13 @@ func join(config *Config) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	c := pb.NewBossClient(conn)
+	c := pb.NewBossServiceClient(conn)
 
 	res, err := c.Join(ctx, &pb.JoinRequest{
-		Name:     config.WorkerName,
-		HostPort: config.PublicHostPort,
+		Member: &pb.Member{
+			Name:     config.WorkerName,
+			HostPort: config.PublicHostPort,
+		},
 	})
 	if err != nil || !res.GetOk() {
 		log.Fatalf("could not join: %v", err)
@@ -122,11 +140,10 @@ func serve(config *Config) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterWorkerServer(s, &Server{
-		Config:       config,
-		NextName:     "",
-		NextHostPort: "",
-		lock:         sync.RWMutex{},
+	pb.RegisterMemberServiceServer(s, &Server{
+		Config: config,
+		Next:   nil,
+		lock:   sync.RWMutex{},
 	})
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
