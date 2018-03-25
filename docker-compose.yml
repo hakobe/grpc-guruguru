@@ -19,3 +19,14 @@ services:
       PUBLIC_HOST_PORT: go:5000
       BOSS_HOST_PORT: boss:5000
     command: go run member.go
+  python:
+    build: ./python
+    volumes:
+      - "./python:/app"
+    depends_on:
+      - boss
+    environment:
+      MEMBER_NAME: python
+      HOST_PORT: 0.0.0.0:5000
+      PUBLIC_HOST_PORT: python:5000
+      BOSS_HOST_PORT: boss:5000
