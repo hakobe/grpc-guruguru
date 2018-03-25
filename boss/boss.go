@@ -15,9 +15,70 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+type Config struct {
+	HostPort string
+}
+
+func getConfig() *Config {
+	hostPort := os.Getenv("HOST_PORT")
+	if hostPort == "" {
+		hostPort = "0.0.0.0:5000"
+	}
+
+	return &Config{
+		HostPort: hostPort,
+	}
+}
+
 type Member struct {
 	Name     string
 	HostPort string
+}
+
+func getConn(hostPort string) *grpc.ClientConn {
+	conn, err := grpc.Dial(hostPort, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	return conn
+}
+
+func poke(from *Member, to *Member) {
+	conn := getConn(to.HostPort)
+	defer conn.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	client := pb.NewMemberServiceClient(conn)
+	res, err := client.Poke(ctx, &pb.PokeRequest{
+		From: &pb.Member{
+			Name:     from.Name,
+			HostPort: from.HostPort,
+		},
+	})
+	if err != nil || !res.GetOk() {
+		log.Fatalf("could not send poke: %v", err)
+	}
+}
+
+func setNext(to *Member, next *Member) {
+	conn := getConn(to.HostPort)
+	defer conn.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	client := pb.NewMemberServiceClient(conn)
+	res, err := client.SetNext(ctx, &pb.SetNextRequest{
+		Member: &pb.Member{
+			Name:     next.Name,
+			HostPort: next.HostPort,
+		},
+	})
+	if err != nil || !res.GetOk() {
+		log.Fatalf("could not set next: %v", err)
+	}
 }
 
 type Server struct {
@@ -72,21 +133,6 @@ func shuffle(data []*Member) {
 	}
 }
 
-type Config struct {
-	HostPort string
-}
-
-func getConfig() *Config {
-	hostPort := os.Getenv("HOST_PORT")
-	if hostPort == "" {
-		hostPort = "0.0.0.0:5000"
-	}
-
-	return &Config{
-		HostPort: hostPort,
-	}
-}
-
 func serve(server *Server, hostPort string) {
 	lis, err := net.Listen("tcp", hostPort)
 	if err != nil {
@@ -97,52 +143,6 @@ func serve(server *Server, hostPort string) {
 	reflection.Register(grpcServer)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
-	}
-}
-
-func getConn(hostPort string) *grpc.ClientConn {
-	conn, err := grpc.Dial(hostPort, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	return conn
-}
-
-func sendPoke(from *Member, to *Member) {
-	conn := getConn(to.HostPort)
-	defer conn.Close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	client := pb.NewMemberServiceClient(conn)
-	res, err := client.Poke(ctx, &pb.PokeRequest{
-		From: &pb.Member{
-			Name:     from.Name,
-			HostPort: from.HostPort,
-		},
-	})
-	if err != nil || !res.GetOk() {
-		log.Fatalf("could not send poke: %v", err)
-	}
-}
-
-func setNext(to *Member, next *Member) {
-	conn := getConn(to.HostPort)
-	defer conn.Close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	client := pb.NewMemberServiceClient(conn)
-	res, err := client.SetNext(ctx, &pb.SetNextRequest{
-		Member: &pb.Member{
-			Name:     next.Name,
-			HostPort: next.HostPort,
-		},
-	})
-	if err != nil || !res.GetOk() {
-		log.Fatalf("could not set next: %v", err)
 	}
 }
 
@@ -161,7 +161,7 @@ func startTask(server *Server) {
 	}
 
 	if len(members) > 0 {
-		sendPoke(&Member{Name: "boss", HostPort: ""}, members[0])
+		poke(&Member{Name: "boss", HostPort: ""}, members[0])
 	}
 }
 
