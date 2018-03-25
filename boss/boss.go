@@ -32,7 +32,7 @@ func newServer() *Server {
 	}
 }
 
-func (s *Server) Join(ctx context.Context, in *pb.JoinRequest) (*pb.Res, error) {
+func (s *Server) Join(ctx context.Context, in *pb.JoinRequest) (*pb.JoinResponse, error) {
 	member := in.GetMember()
 	if member == nil {
 		log.Fatalf("could not get joining member")
@@ -48,7 +48,7 @@ func (s *Server) Join(ctx context.Context, in *pb.JoinRequest) (*pb.Res, error) 
 
 	fmt.Printf("%s is joined.\n", member.GetName())
 
-	return &pb.Res{Ok: true}, nil
+	return &pb.JoinResponse{Ok: true}, nil
 }
 
 func (s *Server) GetMembers() []*Member {

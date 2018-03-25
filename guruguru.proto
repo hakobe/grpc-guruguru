@@ -5,16 +5,16 @@ message Member {
     string host_port = 2;
 }
 
-message Res {
-    bool ok = 1;
-}
-
 message JoinRequest {
     Member member = 1;
 }
 
+message JoinResponse {
+    bool ok = 1;
+}
+
 service BossService {
-    rpc Join (JoinRequest) returns (Res);
+    rpc Join (JoinRequest) returns (JoinResponse);
 }
 
 message PokeRequest {
@@ -22,11 +22,19 @@ message PokeRequest {
     string message = 2;
 }
 
+message PokeResponse {
+    bool ok = 1;
+}
+
 message SetNextRequest {
     Member member = 1;
 }
 
+message SetNextResponse {
+    bool ok = 1;
+}
+
 service MemberService {
-    rpc Poke(PokeRequest) returns (Res);
-    rpc SetNext (SetNextRequest) returns (Res);
+    rpc Poke(PokeRequest) returns (PokeResponse);
+    rpc SetNext (SetNextRequest) returns (SetNextResponse);
 }

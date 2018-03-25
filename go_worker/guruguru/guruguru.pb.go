@@ -9,10 +9,12 @@ It is generated from these files:
 
 It has these top-level messages:
 	Member
-	Res
 	JoinRequest
+	JoinResponse
 	PokeRequest
+	PokeResponse
 	SetNextRequest
+	SetNextResponse
 */
 package guruguru
 
@@ -60,22 +62,6 @@ func (m *Member) GetHostPort() string {
 	return ""
 }
 
-type Res struct {
-	Ok bool `protobuf:"varint,1,opt,name=ok" json:"ok,omitempty"`
-}
-
-func (m *Res) Reset()                    { *m = Res{} }
-func (m *Res) String() string            { return proto.CompactTextString(m) }
-func (*Res) ProtoMessage()               {}
-func (*Res) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *Res) GetOk() bool {
-	if m != nil {
-		return m.Ok
-	}
-	return false
-}
-
 type JoinRequest struct {
 	Member *Member `protobuf:"bytes,1,opt,name=member" json:"member,omitempty"`
 }
@@ -83,13 +69,29 @@ type JoinRequest struct {
 func (m *JoinRequest) Reset()                    { *m = JoinRequest{} }
 func (m *JoinRequest) String() string            { return proto.CompactTextString(m) }
 func (*JoinRequest) ProtoMessage()               {}
-func (*JoinRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*JoinRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *JoinRequest) GetMember() *Member {
 	if m != nil {
 		return m.Member
 	}
 	return nil
+}
+
+type JoinResponse struct {
+	Ok bool `protobuf:"varint,1,opt,name=ok" json:"ok,omitempty"`
+}
+
+func (m *JoinResponse) Reset()                    { *m = JoinResponse{} }
+func (m *JoinResponse) String() string            { return proto.CompactTextString(m) }
+func (*JoinResponse) ProtoMessage()               {}
+func (*JoinResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *JoinResponse) GetOk() bool {
+	if m != nil {
+		return m.Ok
+	}
+	return false
 }
 
 type PokeRequest struct {
@@ -116,6 +118,22 @@ func (m *PokeRequest) GetMessage() string {
 	return ""
 }
 
+type PokeResponse struct {
+	Ok bool `protobuf:"varint,1,opt,name=ok" json:"ok,omitempty"`
+}
+
+func (m *PokeResponse) Reset()                    { *m = PokeResponse{} }
+func (m *PokeResponse) String() string            { return proto.CompactTextString(m) }
+func (*PokeResponse) ProtoMessage()               {}
+func (*PokeResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *PokeResponse) GetOk() bool {
+	if m != nil {
+		return m.Ok
+	}
+	return false
+}
+
 type SetNextRequest struct {
 	Member *Member `protobuf:"bytes,1,opt,name=member" json:"member,omitempty"`
 }
@@ -123,7 +141,7 @@ type SetNextRequest struct {
 func (m *SetNextRequest) Reset()                    { *m = SetNextRequest{} }
 func (m *SetNextRequest) String() string            { return proto.CompactTextString(m) }
 func (*SetNextRequest) ProtoMessage()               {}
-func (*SetNextRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*SetNextRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *SetNextRequest) GetMember() *Member {
 	if m != nil {
@@ -132,12 +150,30 @@ func (m *SetNextRequest) GetMember() *Member {
 	return nil
 }
 
+type SetNextResponse struct {
+	Ok bool `protobuf:"varint,1,opt,name=ok" json:"ok,omitempty"`
+}
+
+func (m *SetNextResponse) Reset()                    { *m = SetNextResponse{} }
+func (m *SetNextResponse) String() string            { return proto.CompactTextString(m) }
+func (*SetNextResponse) ProtoMessage()               {}
+func (*SetNextResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+func (m *SetNextResponse) GetOk() bool {
+	if m != nil {
+		return m.Ok
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*Member)(nil), "Member")
-	proto.RegisterType((*Res)(nil), "Res")
 	proto.RegisterType((*JoinRequest)(nil), "JoinRequest")
+	proto.RegisterType((*JoinResponse)(nil), "JoinResponse")
 	proto.RegisterType((*PokeRequest)(nil), "PokeRequest")
+	proto.RegisterType((*PokeResponse)(nil), "PokeResponse")
 	proto.RegisterType((*SetNextRequest)(nil), "SetNextRequest")
+	proto.RegisterType((*SetNextResponse)(nil), "SetNextResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -151,7 +187,7 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for BossService service
 
 type BossServiceClient interface {
-	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Res, error)
+	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 }
 
 type bossServiceClient struct {
@@ -162,8 +198,8 @@ func NewBossServiceClient(cc *grpc.ClientConn) BossServiceClient {
 	return &bossServiceClient{cc}
 }
 
-func (c *bossServiceClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Res, error) {
-	out := new(Res)
+func (c *bossServiceClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error) {
+	out := new(JoinResponse)
 	err := grpc.Invoke(ctx, "/BossService/Join", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -174,7 +210,7 @@ func (c *bossServiceClient) Join(ctx context.Context, in *JoinRequest, opts ...g
 // Server API for BossService service
 
 type BossServiceServer interface {
-	Join(context.Context, *JoinRequest) (*Res, error)
+	Join(context.Context, *JoinRequest) (*JoinResponse, error)
 }
 
 func RegisterBossServiceServer(s *grpc.Server, srv BossServiceServer) {
@@ -215,8 +251,8 @@ var _BossService_serviceDesc = grpc.ServiceDesc{
 // Client API for MemberService service
 
 type MemberServiceClient interface {
-	Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*Res, error)
-	SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*Res, error)
+	Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*PokeResponse, error)
+	SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*SetNextResponse, error)
 }
 
 type memberServiceClient struct {
@@ -227,8 +263,8 @@ func NewMemberServiceClient(cc *grpc.ClientConn) MemberServiceClient {
 	return &memberServiceClient{cc}
 }
 
-func (c *memberServiceClient) Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*Res, error) {
-	out := new(Res)
+func (c *memberServiceClient) Poke(ctx context.Context, in *PokeRequest, opts ...grpc.CallOption) (*PokeResponse, error) {
+	out := new(PokeResponse)
 	err := grpc.Invoke(ctx, "/MemberService/Poke", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -236,8 +272,8 @@ func (c *memberServiceClient) Poke(ctx context.Context, in *PokeRequest, opts ..
 	return out, nil
 }
 
-func (c *memberServiceClient) SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*Res, error) {
-	out := new(Res)
+func (c *memberServiceClient) SetNext(ctx context.Context, in *SetNextRequest, opts ...grpc.CallOption) (*SetNextResponse, error) {
+	out := new(SetNextResponse)
 	err := grpc.Invoke(ctx, "/MemberService/SetNext", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -248,8 +284,8 @@ func (c *memberServiceClient) SetNext(ctx context.Context, in *SetNextRequest, o
 // Server API for MemberService service
 
 type MemberServiceServer interface {
-	Poke(context.Context, *PokeRequest) (*Res, error)
-	SetNext(context.Context, *SetNextRequest) (*Res, error)
+	Poke(context.Context, *PokeRequest) (*PokeResponse, error)
+	SetNext(context.Context, *SetNextRequest) (*SetNextResponse, error)
 }
 
 func RegisterMemberServiceServer(s *grpc.Server, srv MemberServiceServer) {
@@ -312,21 +348,23 @@ var _MemberService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("guruguru.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 249 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0xc1, 0x4a, 0xc3, 0x40,
-	0x10, 0x86, 0x69, 0x0c, 0x49, 0x3b, 0xa9, 0x11, 0x06, 0x84, 0xd0, 0x1e, 0x2c, 0x7b, 0xd2, 0xcb,
-	0x82, 0xf1, 0xe4, 0x55, 0x3c, 0x09, 0x95, 0xb2, 0x7d, 0x00, 0x69, 0x65, 0xac, 0x25, 0x6c, 0xa7,
-	0xee, 0x6c, 0xc4, 0xc7, 0x97, 0xec, 0xa6, 0x10, 0x3d, 0xf5, 0xb0, 0xb0, 0xfb, 0xef, 0x37, 0xfc,
-	0x1f, 0x03, 0xe5, 0xae, 0x75, 0x6d, 0x77, 0xf4, 0xd1, 0xb1, 0x67, 0xf5, 0x08, 0xd9, 0x92, 0xec,
-	0x96, 0x1c, 0x22, 0xa4, 0x87, 0x8d, 0xa5, 0x6a, 0xb4, 0x18, 0xdd, 0x4e, 0x4c, 0xb8, 0xe3, 0x1c,
-	0x26, 0x9f, 0x2c, 0xfe, 0xed, 0xc8, 0xce, 0x57, 0x49, 0xf8, 0x18, 0x77, 0xc1, 0x8a, 0x9d, 0x57,
-	0xd7, 0x70, 0x61, 0x48, 0xb0, 0x84, 0x84, 0x9b, 0x30, 0x35, 0x36, 0x09, 0x37, 0x4a, 0x43, 0xf1,
-	0xc2, 0xfb, 0x83, 0xa1, 0xaf, 0x96, 0xc4, 0xe3, 0x0d, 0x64, 0x36, 0x14, 0x04, 0xa4, 0xa8, 0x73,
-	0x1d, 0xfb, 0x4c, 0x1f, 0xab, 0x67, 0x28, 0x56, 0xdc, 0xd0, 0x89, 0x9f, 0x43, 0xfa, 0xe1, 0xd8,
-	0xfe, 0xa7, 0x43, 0x88, 0x15, 0xe4, 0x96, 0x44, 0x36, 0x3b, 0xea, 0x6d, 0x4e, 0x4f, 0x75, 0x0f,
-	0xe5, 0x9a, 0xfc, 0x2b, 0xfd, 0xf8, 0x73, 0x8b, 0xeb, 0x3b, 0x28, 0x9e, 0x58, 0x64, 0x4d, 0xee,
-	0x7b, 0xff, 0x4e, 0x38, 0x83, 0xb4, 0xf3, 0xc6, 0xa9, 0x1e, 0xe8, 0xcf, 0x52, 0x6d, 0x48, 0xea,
-	0x25, 0x5c, 0xc6, 0xe1, 0x01, 0xdc, 0x49, 0xe3, 0x54, 0x0f, 0xdc, 0x23, 0x8c, 0x0b, 0xc8, 0x7b,
-	0x15, 0xbc, 0xd2, 0x7f, 0xa5, 0x22, 0xb1, 0xcd, 0xc2, 0xee, 0x1f, 0x7e, 0x03, 0x00, 0x00, 0xff,
-	0xff, 0x93, 0x26, 0x2a, 0x4e, 0x8d, 0x01, 0x00, 0x00,
+	// 274 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0x4f, 0x4b, 0xc3, 0x40,
+	0x10, 0xc5, 0x69, 0x09, 0x49, 0x3b, 0xf9, 0x53, 0x99, 0x53, 0x48, 0xc1, 0x3f, 0xf1, 0xe2, 0x41,
+	0x16, 0x8c, 0x27, 0xaf, 0xe2, 0x49, 0x50, 0x4a, 0xfa, 0x01, 0xa4, 0x91, 0xb1, 0x96, 0xb0, 0x99,
+	0xb8, 0xbb, 0x11, 0x3f, 0xbe, 0xec, 0x26, 0x95, 0xb4, 0x28, 0x78, 0x08, 0x64, 0x67, 0x67, 0x7e,
+	0xef, 0xbd, 0x59, 0x48, 0xb6, 0x9d, 0xea, 0xec, 0x27, 0x5a, 0xc5, 0x86, 0xf3, 0x3b, 0xf0, 0x9f,
+	0x48, 0x56, 0xa4, 0x10, 0xc1, 0x6b, 0x36, 0x92, 0xd2, 0xc9, 0xf9, 0xe4, 0x6a, 0x5e, 0xba, 0x7f,
+	0x5c, 0xc2, 0xfc, 0x9d, 0xb5, 0x79, 0x69, 0x59, 0x99, 0x74, 0xea, 0x2e, 0x66, 0xb6, 0xb0, 0x62,
+	0x65, 0x72, 0x01, 0xe1, 0x23, 0xef, 0x9a, 0x92, 0x3e, 0x3a, 0xd2, 0x06, 0xcf, 0xc0, 0x97, 0x8e,
+	0xe4, 0x08, 0x61, 0x11, 0x88, 0x1e, 0x5c, 0x0e, 0xe5, 0xfc, 0x14, 0xa2, 0xbe, 0x5f, 0xb7, 0xdc,
+	0x68, 0xc2, 0x04, 0xa6, 0x5c, 0xbb, 0xe6, 0x59, 0x39, 0xe5, 0x3a, 0x7f, 0x80, 0x70, 0xc5, 0x35,
+	0xed, 0x79, 0x4b, 0xf0, 0xde, 0x14, 0xcb, 0x63, 0x9a, 0x2b, 0x62, 0x0a, 0x81, 0x24, 0xad, 0x37,
+	0x5b, 0x1a, 0x6c, 0xed, 0x8f, 0x56, 0xa5, 0xa7, 0xfc, 0xa1, 0x72, 0x03, 0xc9, 0x9a, 0xcc, 0x33,
+	0x7d, 0x99, 0x7f, 0x1b, 0xbf, 0x80, 0xc5, 0xcf, 0xc8, 0xef, 0xd4, 0xa2, 0x80, 0xf0, 0x9e, 0xb5,
+	0x5e, 0x93, 0xfa, 0xdc, 0xbd, 0x12, 0x5e, 0x82, 0x67, 0xa3, 0x62, 0x24, 0x46, 0x1b, 0xca, 0x62,
+	0x31, 0xce, 0x5f, 0x54, 0x10, 0xf7, 0x42, 0xa3, 0x29, 0x6b, 0x1d, 0x23, 0x31, 0xda, 0x43, 0x16,
+	0x8b, 0x83, 0x3c, 0xd7, 0x10, 0x0c, 0x66, 0x70, 0x21, 0x0e, 0x93, 0x64, 0x27, 0xe2, 0xc8, 0x67,
+	0xe5, 0xbb, 0x57, 0xbe, 0xfd, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x6a, 0x4e, 0x53, 0x10, 0xf7, 0x01,
+	0x00, 0x00,
 }

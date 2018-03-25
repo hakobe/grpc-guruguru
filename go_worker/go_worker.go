@@ -25,7 +25,7 @@ type Server struct {
 	lock   sync.RWMutex
 }
 
-func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.Res, error) {
+func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.SetNextResponse, error) {
 	if member := in.GetMember(); member != nil {
 		s.lock.Lock()
 		defer s.lock.Unlock()
@@ -34,9 +34,9 @@ func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.Res, e
 			HostPort: member.HostPort,
 		}
 		fmt.Printf("Set next to %s(%s)\n", s.Next.Name, s.Next.HostPort)
-		return &pb.Res{Ok: true}, nil
+		return &pb.SetNextResponse{Ok: true}, nil
 	}
-	return &pb.Res{Ok: false}, nil
+	return &pb.SetNextResponse{Ok: false}, nil
 }
 
 func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
@@ -68,9 +68,9 @@ func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
 	}
 }
 
-func (s *Server) Poke(ctx context.Context, in *pb.PokeRequest) (*pb.Res, error) {
+func (s *Server) Poke(ctx context.Context, in *pb.PokeRequest) (*pb.PokeResponse, error) {
 	go s.poke(ctx, in)
-	return &pb.Res{Ok: true}, nil
+	return &pb.PokeResponse{Ok: true}, nil
 }
 
 type Config struct {
