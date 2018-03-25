@@ -7,15 +7,15 @@ services:
     environment:
       HOST_PORT: 0.0.0.0:5000
     command: go run boss.go
-  go_worker:
-    build: ./go_worker
+  go:
+    build: ./go
     volumes:
-      - "./go_worker:/go/src/github.com/hakobe/grpc-guruguru/go_worker"
+      - "./go:/go/src/github.com/hakobe/grpc-guruguru/go"
     depends_on:
       - boss
     environment:
-      WORKER_NAME: go_worker
+      MEMBER_NAME: go
       HOST_PORT: 0.0.0.0:5000
-      PUBLIC_HOST_PORT: go_worker:5000
+      PUBLIC_HOST_PORT: go:5000
       BOSS_HOST_PORT: boss:5000
-    command: go run go_worker.go
+    command: go run member.go

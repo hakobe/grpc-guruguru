@@ -148,7 +148,7 @@ func serve(server *Server, hostPort string) {
 
 func startTask(server *Server) {
 	time.Sleep(5 * time.Second)
-	fmt.Println("Workers are gathered.")
+	fmt.Println("Members are gathered.")
 
 	members := server.GetMembers()
 	n := len(members)
@@ -156,7 +156,7 @@ func startTask(server *Server) {
 		member := members[i]
 		nextMember := members[(i+1)%n]
 
-		fmt.Printf("Setting worker %s(%s) -> %s(%s)\n", member.Name, member.HostPort, nextMember.Name, nextMember.HostPort)
+		fmt.Printf("Setting a order of the member %s(%s) -> %s(%s)\n", member.Name, member.HostPort, nextMember.Name, nextMember.HostPort)
 		setNext(member, nextMember)
 	}
 

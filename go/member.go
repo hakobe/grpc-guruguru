@@ -9,22 +9,22 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/hakobe/grpc-guruguru/go_worker/guruguru"
+	pb "github.com/hakobe/grpc-guruguru/go/guruguru"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 type Config struct {
-	WorkerName     string
+	Name           string
 	HostPort       string
 	PublicHostPort string
 	BossHostPort   string
 }
 
 func getConfig() *Config {
-	workerName := os.Getenv("WORKER_NAME")
-	if workerName == "" {
-		workerName = "go_worker"
+	memberName := os.Getenv("MEMBER_NAME")
+	if memberName == "" {
+		memberName = "go"
 	}
 	hostPort := os.Getenv("HOST_PORT")
 	if hostPort == "" {
@@ -40,7 +40,7 @@ func getConfig() *Config {
 	}
 
 	return &Config{
-		WorkerName:     workerName,
+		Name:           memberName,
 		HostPort:       hostPort,
 		PublicHostPort: publicHostPort,
 		BossHostPort:   bossHostPort,
@@ -71,7 +71,7 @@ func join(config *Config) {
 
 	res, err := c.Join(ctx, &pb.JoinRequest{
 		Member: &pb.Member{
-			Name:     config.WorkerName,
+			Name:     config.Name,
 			HostPort: config.PublicHostPort,
 		},
 	})
@@ -127,7 +127,7 @@ func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
 		log.Fatalf("could not get from-member")
 	}
 
-	fmt.Printf("from:%s -> me:%s -> next:%s\n", from.GetName(), s.Config.WorkerName, s.Next.Name)
+	fmt.Printf("from:%s -> me:%s -> next:%s\n", from.GetName(), s.Config.Name, s.Next.Name)
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -158,7 +158,7 @@ func serve(config *Config) {
 
 func main() {
 	config := getConfig()
-	fmt.Printf("Starting... I'm %s\n", config.WorkerName)
+	fmt.Printf("Starting... I'm %s\n", config.Name)
 
 	join(config)
 	serve(config)
