@@ -70,7 +70,7 @@ func join(config *Config) {
 	c := pb.NewBossServiceClient(conn)
 
 	res, err := c.Join(ctx, &pb.JoinRequest{
-		Member: &pb.Member{
+		JoiningMember: &pb.Member{
 			Name:     config.Name,
 			HostPort: config.PublicHostPort,
 		},
@@ -80,7 +80,7 @@ func join(config *Config) {
 	}
 }
 
-func poke(to *Member) {
+func poke(to *Member, config *Config) {
 	conn := getConn(to.HostPort)
 	defer conn.Close()
 
@@ -89,16 +89,15 @@ func poke(to *Member) {
 
 	client := pb.NewMemberServiceClient(conn)
 	res, err := client.Poke(ctx, &pb.PokeRequest{
-		From: &pb.Member{
-			Name:     to.Name,
-			HostPort: to.HostPort,
+		FromMember: &pb.Member{
+			Name:     config.Name,
+			HostPort: config.PublicHostPort,
 		},
 		Message: "Gopher is the best programming language mascot!!",
 	})
 	if err != nil || !res.GetOk() {
-		log.Fatalf("could not send task: %v", err)
+		log.Fatalf("could not poke: %v", err)
 	}
-
 }
 
 type Server struct {
@@ -108,7 +107,7 @@ type Server struct {
 }
 
 func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.SetNextResponse, error) {
-	if member := in.GetMember(); member != nil {
+	if member := in.GetNextMember(); member != nil {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 		s.Next = &Member{
@@ -122,16 +121,16 @@ func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.SetNex
 }
 
 func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
-	from := in.GetFrom()
+	from := in.GetFromMember()
 	if from == nil {
 		log.Fatalf("could not get from-member")
 	}
 
-	fmt.Printf("from:%s -> me:%s -> next:%s\n", from.GetName(), s.Config.Name, s.Next.Name)
+	fmt.Printf("Got message \"%s\" from %s. Hey %s! \n", in.GetMessage(), from.Name, s.Next.Name)
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	poke(s.Next)
+	poke(s.Next, s.Config)
 }
 
 func (s *Server) Poke(ctx context.Context, in *pb.PokeRequest) (*pb.PokeResponse, error) {

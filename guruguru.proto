@@ -6,7 +6,7 @@ message Member {
 }
 
 message JoinRequest {
-    Member member = 1;
+    Member joining_member = 1;
 }
 
 message JoinResponse {
@@ -18,7 +18,7 @@ service BossService {
 }
 
 message PokeRequest {
-    Member from = 1;
+    Member from_member = 1;
     string message = 2;
 }
 
@@ -27,7 +27,7 @@ message PokeResponse {
 }
 
 message SetNextRequest {
-    Member member = 1;
+    Member next_member = 1;
 }
 
 message SetNextResponse {

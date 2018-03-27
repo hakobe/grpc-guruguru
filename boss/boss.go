@@ -52,7 +52,7 @@ func poke(from *Member, to *Member) {
 
 	client := pb.NewMemberServiceClient(conn)
 	res, err := client.Poke(ctx, &pb.PokeRequest{
-		From: &pb.Member{
+		FromMember: &pb.Member{
 			Name:     from.Name,
 			HostPort: from.HostPort,
 		},
@@ -71,7 +71,7 @@ func setNext(to *Member, next *Member) {
 
 	client := pb.NewMemberServiceClient(conn)
 	res, err := client.SetNext(ctx, &pb.SetNextRequest{
-		Member: &pb.Member{
+		NextMember: &pb.Member{
 			Name:     next.Name,
 			HostPort: next.HostPort,
 		},
@@ -94,7 +94,7 @@ func newServer() *Server {
 }
 
 func (s *Server) Join(ctx context.Context, in *pb.JoinRequest) (*pb.JoinResponse, error) {
-	member := in.GetMember()
+	member := in.GetJoiningMember()
 	if member == nil {
 		log.Fatalf("could not get joining member")
 	}
