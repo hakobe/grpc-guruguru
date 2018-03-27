@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='guruguru.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x0eguruguru.proto\")\n\x06Member\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\thost_port\x18\x02 \x01(\t\"&\n\x0bJoinRequest\x12\x17\n\x06member\x18\x01 \x01(\x0b\x32\x07.Member\"\x1a\n\x0cJoinResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\"5\n\x0bPokeRequest\x12\x15\n\x04\x66rom\x18\x01 \x01(\x0b\x32\x07.Member\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1a\n\x0cPokeResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\")\n\x0eSetNextRequest\x12\x17\n\x06member\x18\x01 \x01(\x0b\x32\x07.Member\"\x1d\n\x0fSetNextResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x32\x32\n\x0b\x42ossService\x12#\n\x04Join\x12\x0c.JoinRequest\x1a\r.JoinResponse2b\n\rMemberService\x12#\n\x04Poke\x12\x0c.PokeRequest\x1a\r.PokeResponse\x12,\n\x07SetNext\x12\x0f.SetNextRequest\x1a\x10.SetNextResponseb\x06proto3')
+  serialized_pb=_b('\n\x0eguruguru.proto\")\n\x06Member\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\thost_port\x18\x02 \x01(\t\".\n\x0bJoinRequest\x12\x1f\n\x0ejoining_member\x18\x01 \x01(\x0b\x32\x07.Member\"\x1a\n\x0cJoinResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\"<\n\x0bPokeRequest\x12\x1c\n\x0b\x66rom_member\x18\x01 \x01(\x0b\x32\x07.Member\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1a\n\x0cPokeResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\".\n\x0eSetNextRequest\x12\x1c\n\x0bnext_member\x18\x01 \x01(\x0b\x32\x07.Member\"\x1d\n\x0fSetNextResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x32\x32\n\x0b\x42ossService\x12#\n\x04Join\x12\x0c.JoinRequest\x1a\r.JoinResponse2b\n\rMemberService\x12#\n\x04Poke\x12\x0c.PokeRequest\x1a\r.PokeResponse\x12,\n\x07SetNext\x12\x0f.SetNextRequest\x1a\x10.SetNextResponseb\x06proto3')
 )
 
 
@@ -71,7 +71,7 @@ _JOINREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='member', full_name='JoinRequest.member', index=0,
+      name='joining_member', full_name='JoinRequest.joining_member', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -90,7 +90,7 @@ _JOINREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=61,
-  serialized_end=99,
+  serialized_end=107,
 )
 
 
@@ -120,8 +120,8 @@ _JOINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=101,
-  serialized_end=127,
+  serialized_start=109,
+  serialized_end=135,
 )
 
 
@@ -133,7 +133,7 @@ _POKEREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='from', full_name='PokeRequest.from', index=0,
+      name='from_member', full_name='PokeRequest.from_member', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -158,8 +158,8 @@ _POKEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=129,
-  serialized_end=182,
+  serialized_start=137,
+  serialized_end=197,
 )
 
 
@@ -189,8 +189,8 @@ _POKERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=184,
-  serialized_end=210,
+  serialized_start=199,
+  serialized_end=225,
 )
 
 
@@ -202,7 +202,7 @@ _SETNEXTREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='member', full_name='SetNextRequest.member', index=0,
+      name='next_member', full_name='SetNextRequest.next_member', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -220,8 +220,8 @@ _SETNEXTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=212,
-  serialized_end=253,
+  serialized_start=227,
+  serialized_end=273,
 )
 
 
@@ -251,13 +251,13 @@ _SETNEXTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=255,
-  serialized_end=284,
+  serialized_start=275,
+  serialized_end=304,
 )
 
-_JOINREQUEST.fields_by_name['member'].message_type = _MEMBER
-_POKEREQUEST.fields_by_name['from'].message_type = _MEMBER
-_SETNEXTREQUEST.fields_by_name['member'].message_type = _MEMBER
+_JOINREQUEST.fields_by_name['joining_member'].message_type = _MEMBER
+_POKEREQUEST.fields_by_name['from_member'].message_type = _MEMBER
+_SETNEXTREQUEST.fields_by_name['next_member'].message_type = _MEMBER
 DESCRIPTOR.message_types_by_name['Member'] = _MEMBER
 DESCRIPTOR.message_types_by_name['JoinRequest'] = _JOINREQUEST
 DESCRIPTOR.message_types_by_name['JoinResponse'] = _JOINRESPONSE
@@ -324,8 +324,8 @@ _BOSSSERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=286,
-  serialized_end=336,
+  serialized_start=306,
+  serialized_end=356,
   methods=[
   _descriptor.MethodDescriptor(
     name='Join',
@@ -348,8 +348,8 @@ _MEMBERSERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=1,
   options=None,
-  serialized_start=338,
-  serialized_end=436,
+  serialized_start=358,
+  serialized_end=456,
   methods=[
   _descriptor.MethodDescriptor(
     name='Poke',

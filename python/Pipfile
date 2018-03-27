@@ -8,6 +8,8 @@ grpcio = "*"
 grpcio-tools = "*"
 
 [dev-packages]
+"flake8" = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.6"
