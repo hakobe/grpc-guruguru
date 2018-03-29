@@ -1,0 +1,17 @@
+{
+    "plugins": [],
+    "env": {
+        "development": {
+            "presets": [
+                [
+                    "env",
+                    {
+                        "targets": {
+                            "node": "9.9"
+                        }
+                    }
+                ]
+            ]
+        }
+    }
+}

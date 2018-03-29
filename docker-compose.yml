@@ -30,3 +30,14 @@ services:
       HOST_PORT: 0.0.0.0:5000
       PUBLIC_HOST_PORT: python:5000
       BOSS_HOST_PORT: boss:5000
+  node:
+    build: ./node
+    volumes:
+      - "./node:/app"
+    depends_on:
+      - boss
+    environment:
+      MEMBER_NAME: node
+      HOST_PORT: 0.0.0.0:5000
+      PUBLIC_HOST_PORT: node:5000
+      BOSS_HOST_PORT: boss:5000

@@ -1,2 +1,5 @@
 guruguru.proto
 !/guruguru.proto
+node/node_modules
+node/member.out.js
+node/yarn-error.log

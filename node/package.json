@@ -1,0 +1,29 @@
+{
+  "private": true,
+  "main": "member.js",
+  "scripts": {
+    "build": "babel -o member.out.js member.js ",
+    "start": "yarn run build && node member.out.js",
+    "gen-pb": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:. --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` ./guruguru.proto"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "grpc-tools": "^1.6.6",
+    "prettier": "^1.11.1"
+  },
+  "dependencies": {
+    "google-protobuf": "^3.5.0",
+    "grpc": "^1.10.0"
+  }
+}
