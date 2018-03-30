@@ -81,7 +81,6 @@ def run():
     time.sleep(1)  # wait boss
 
     join(config)
-    log('serve')
     serve(config)
 
 
