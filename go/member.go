@@ -107,26 +107,22 @@ type Server struct {
 }
 
 func (s *Server) SetNext(ctx context.Context, in *pb.SetNextRequest) (*pb.SetNextResponse, error) {
-	if member := in.GetNextMember(); member != nil {
-		s.lock.Lock()
-		defer s.lock.Unlock()
-		s.Next = &Member{
-			Name:     member.Name,
-			HostPort: member.HostPort,
-		}
-		fmt.Printf("Set next to %s(%s)\n", s.Next.Name, s.Next.HostPort)
-		return &pb.SetNextResponse{Ok: true}, nil
+	member := in.GetNextMember()
+	if member == nil {
+		return &pb.SetNextResponse{Ok: false}, nil
 	}
-	return &pb.SetNextResponse{Ok: false}, nil
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.Next = &Member{
+		Name:     member.Name,
+		HostPort: member.HostPort,
+	}
+	fmt.Printf("Set next to %s(%s)\n", s.Next.Name, s.Next.HostPort)
+	return &pb.SetNextResponse{Ok: true}, nil
 }
 
-func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
-	from := in.GetFromMember()
-	if from == nil {
-		log.Fatalf("could not get from-member")
-	}
-
-	fmt.Printf("Got message \"%s\" from %s. Hey %s! \n", in.GetMessage(), from.Name, s.Next.Name)
+func (s *Server) poke() {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -134,7 +130,9 @@ func (s *Server) poke(ctx context.Context, in *pb.PokeRequest) {
 }
 
 func (s *Server) Poke(ctx context.Context, in *pb.PokeRequest) (*pb.PokeResponse, error) {
-	go s.poke(ctx, in)
+	from := in.GetFromMember()
+	fmt.Printf("Got message \"%s\" from %s. Hey %s! \n", in.GetMessage(), from.Name, s.Next.Name)
+	go s.poke()
 	return &pb.PokeResponse{Ok: true}, nil
 }
 
