@@ -6,4 +6,6 @@ RUN yarn install
 
 COPY . .
 
-CMD ["node", "member.js"]
+RUN yarn run build
+
+CMD ["node", "member.out.js"]

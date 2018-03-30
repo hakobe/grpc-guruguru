@@ -41,3 +41,4 @@ services:
       HOST_PORT: 0.0.0.0:5000
       PUBLIC_HOST_PORT: node:5000
       BOSS_HOST_PORT: boss:5000
+    command: yarn run start
