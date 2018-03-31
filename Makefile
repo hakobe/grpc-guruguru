@@ -12,3 +12,5 @@ gen-pb:
 		docker-compose run --rm --no-deps go /protoc/bin/protoc ./guruguru.proto --go_out=plugins=grpc:guruguru
 	cp guruguru.proto ./node/guruguru.proto && \
 		docker-compose run --rm --no-deps node yarn run gen-pb
+	cp guruguru.proto ./ruby/guruguru.proto && \
+		docker-compose run --rm --no-deps ruby grpc_tools_ruby_protoc --ruby_out=. --grpc_out=. ./guruguru.proto

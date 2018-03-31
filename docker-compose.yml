@@ -42,3 +42,14 @@ services:
       PUBLIC_HOST_PORT: node:5000
       BOSS_HOST_PORT: boss:5000
     command: yarn run start
+  ruby:
+    build: ./ruby
+    volumes:
+      - "./ruby:/app"
+    depends_on:
+      - boss
+    environment:
+      MEMBER_NAME: ruby
+      HOST_PORT: 0.0.0.0:5000
+      PUBLIC_HOST_PORT: ruby:5000
+      BOSS_HOST_PORT: boss:5000
