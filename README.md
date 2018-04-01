@@ -3,7 +3,7 @@ This is a useless gRPC server/client process model. This project is for my gRPC 
 
 First, a boss process waits for member processes joining. Once all members joined the boss forms cyclic linked list of members by setting next process to each members.
 
-Each members accept poke messages. When a member receives a poke message, then the member sends a new poke message to its next member process. That means that poke messages loop around the members list infinitely.
+Each member accepts poke messages. When a member receives a poke message, then the member sends a new poke message to its next member process. That means that poke messages loop around the members list infinitely.
 
 ![](./guruguru.png)
 
