@@ -7,7 +7,7 @@ Each members accept poke messages. When a member receives a poke message, then t
 
 ![](./guruguru.png)
 
-Member processes are written by different language for each other. These are based on the same proto file as you can see. Used languages are below:
+Member processes are written by each language. These are based on the same proto file as you can see. Used languages are below:
 
 - Go
 - Python
