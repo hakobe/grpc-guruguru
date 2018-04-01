@@ -22,3 +22,6 @@ $ make build # for first
 $ make up
 ```
 
+## License
+
+MIT by @hakobe
