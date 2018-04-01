@@ -1,4 +1,6 @@
 .PHONY: up gen-pb
+build:
+	docker-compose build
 up:
 	docker-compose up
 down:
@@ -14,3 +16,5 @@ gen-pb:
 		docker-compose run --rm --no-deps node yarn run gen-pb
 	cp guruguru.proto ./ruby/guruguru.proto && \
 		docker-compose run --rm --no-deps ruby grpc_tools_ruby_protoc --ruby_out=. --grpc_out=. ./guruguru.proto
+	cp guruguru.proto ./elixir/guruguru.proto && \
+		docker-compose run --rm --no-deps elixir protoc --elixir_out=plugins=grpc:./lib guruguru.proto
